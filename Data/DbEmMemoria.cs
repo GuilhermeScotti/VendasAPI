@@ -1,5 +1,5 @@
 ﻿using System.Collections.Concurrent;
-using System.Net;
+using DataAbstraction;
 using Domain.Entidades;
 
 namespace Data;
@@ -9,6 +9,24 @@ internal class DbEmMemoria
   static DbEmMemoria()
   {
     AdicionarDadosDeTeste();
+  }
+
+  /// <summary>
+  /// Apeans para simular uma transação
+  /// </summary>
+  private class TransaçãoFake : ITransação
+  {
+    public void Dispose()
+    {
+    }
+
+    public void Completar() { }
+    public void Cancelar() { }
+  }
+
+  public static ITransação IniciarTransação()
+  {
+    return new TransaçãoFake();
   }
 
   public static ConcurrentDictionary<Guid, Venda> Vendas { get; } = new();
