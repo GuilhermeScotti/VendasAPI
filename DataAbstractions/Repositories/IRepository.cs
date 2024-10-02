@@ -11,3 +11,12 @@ where TEntity : IEntity
   Task AtualizarAsync(TEntity entidade);
   Task<bool> DeletarAsync(Guid id);
 }
+
+public interface IVendaProdutoRepository : IRepository<VendaProduto>
+{
+  Task<IEnumerable<VendaProduto>> ObterPorIdVendaAsync(Guid idVenda);
+}
+
+public interface IVendaRepository : IRepository<Venda>
+{
+}
