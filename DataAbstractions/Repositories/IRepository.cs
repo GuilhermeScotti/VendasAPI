@@ -19,4 +19,5 @@ public interface IVendaProdutoRepository : IRepository<VendaProduto>
 
 public interface IVendaRepository : IRepository<Venda>
 {
+  Task<VendaCompletaDto?> ObterCompletaPorIdAsync(Guid id);
 }

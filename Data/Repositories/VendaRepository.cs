@@ -3,7 +3,7 @@ using Domain.Entidades;
 
 namespace Data.Repositories;
 
-public class VendaRepository : BaseRepository<Venda>
+public class VendaRepository : BaseRepository<Venda>, IVendaRepository
 {
   private readonly IVendaProdutoRepository vendaProdutoRepository;
 
@@ -12,7 +12,7 @@ public class VendaRepository : BaseRepository<Venda>
     this.vendaProdutoRepository = vendaProdutoRepository;
   }
 
-  public async override Task<Venda?> ObterPorIdAsync(Guid id)
+  public async Task<VendaCompletaDto?> ObterCompletaPorIdAsync(Guid id)
   {
     var venda = await base.ObterPorIdAsync(id);
 
@@ -20,6 +20,15 @@ public class VendaRepository : BaseRepository<Venda>
 
     var vendaProdutos = await vendaProdutoRepository.ObterPorIdVendaAsync(id);
 
-    return venda with { Produtos = vendaProdutos.ToList() };
+    return new VendaCompletaDto
+    {
+      Id = venda.Id,
+      Numero = venda.Numero,
+      Data = venda.Data,
+      IdCliente = venda.IdCliente,
+      IdFilial = venda.IdFilial,
+      Cancelado = venda.Cancelado,
+      Produtos = vendaProdutos.ToList()
+    };
   }
 }
