@@ -5,8 +5,10 @@ using Domain.Entidades;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddScoped<IVendaRepository, VendaRepository>();
 builder.Services.AddScoped<IRepository<Venda>, VendaRepository>();
 builder.Services.AddScoped<IVendaProdutoRepository, VendaProdutoRepository>();
+builder.Services.AddScoped<IRepository<VendaProduto>, VendaProdutoRepository>();
 
 var app = builder.Build();
 
@@ -25,6 +27,13 @@ app.MapGet("/vendas/{id}", async (Guid id, IRepository<Venda> repo) =>
   return venda is not null ? Results.Ok(venda) : Results.NotFound();
 })
 .WithName("ObterVendaPorId");
+
+app.MapGet("/vendaCompleta/{id}", async (Guid id, IVendaRepository repo) =>
+{
+  var venda = await repo.ObterCompletaPorIdAsync(id);
+  return venda is not null ? Results.Ok(venda) : Results.NotFound();
+})
+.WithName("ObterVendaCompletaPorId");
 
 app.MapPost("/vendas", async (Venda novaVenda, IRepository<Venda> repo) =>
 {
