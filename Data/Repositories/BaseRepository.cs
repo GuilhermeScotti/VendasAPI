@@ -23,7 +23,7 @@ where TEntity : IEntity
 
   public virtual Task<bool> DeletarAsync(Guid id)
   {
-    return Task.FromResult(DbEmMemoria.Clientes.TryRemove(id, out _));
+    return Task.FromResult(DbEmMemoria.Dados<TEntity>().TryRemove(id, out _));
   }
 
   public virtual Task<TEntity?> ObterPorIdAsync(Guid id)
