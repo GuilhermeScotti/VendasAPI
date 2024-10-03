@@ -42,7 +42,7 @@ app.MapGet("/vendas/{id}", async (Guid id, IRepository<Venda> repo) =>
 })
 .WithName("ObterVendaPorId");
 
-app.MapGet("/vendaCompleta/{id}", async (Guid id, IVendaRepository repo) =>
+app.MapGet("/vendas/{id}/detalhes", async (Guid id, IVendaRepository repo) =>
 {
   var venda = await repo.ObterCompletaPorIdAsync(id);
   return venda is not null ? Results.Ok(venda) : Results.NotFound();
@@ -51,21 +51,38 @@ app.MapGet("/vendaCompleta/{id}", async (Guid id, IVendaRepository repo) =>
 
 app.MapPost("/vendas", async (CriarVendaDto novaVenda, IVendaRepository repo) =>
 {
-  var vendaCriada = await repo.AdicionarDeDto(novaVenda);
+  var vendaCriada = await repo.AdicionarDeDtoAsync(novaVenda);
   return Results.Created($"/vendas/{vendaCriada.Id}", vendaCriada);
 })
 .WithName("CriarVenda");
 
-app.MapPut("/vendas/{id}", async (Guid id, Venda vendaAtualizada, IRepository<Venda> repo) =>
+app.MapPatch("/vendas/{id}/cancelar", async (Guid id, CancelarVendaDto atualizarVendaDto, IRepository<Venda> repo) =>
 {
   var venda = await repo.ObterPorIdAsync(id);
 
   if (venda is null) return Results.NotFound();
 
-  await repo.AtualizarAsync(vendaAtualizada);
+  await repo.AtualizarAsync(venda with
+  {
+    Cancelado = true,
+    MotivoCancelamento = atualizarVendaDto.MotivoCancelamento
+  });
   return Results.NoContent();
 })
-.WithName("AtualizarVenda");
+.WithName("CancelarVenda");
+
+app.MapPost("/vendas/{id}/produtos", async (Guid id, VenderProdutosDto venderProdutosDto,
+  IVendaProdutoRepository repo,
+  IRepository<Venda> vendaRepo) =>
+{
+  var venda = await vendaRepo.ObterPorIdAsync(id);
+
+  if (venda is null) return Results.NotFound();
+
+  await repo.VenderProdutosAsync(id, venderProdutosDto);
+  return Results.NoContent();
+})
+.WithName("AdicionarProdutosVenda");
 
 app.MapDelete("/vendas/{id}", async (Guid id, IRepository<Venda> repo) =>
 {

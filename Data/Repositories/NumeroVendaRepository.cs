@@ -7,7 +7,7 @@ public class NumeroVendaRepository : BaseRepository<NumeroVenda>, INumeroVendaRe
 {
   private const int MAX_TENTATIVAS = 5;
 
-  public Task<NumeroVenda?> GerarNumeroVenda()
+  public Task<NumeroVenda?> GerarNumeroVendaAsync()
   {
     var tentativa = 1;
 

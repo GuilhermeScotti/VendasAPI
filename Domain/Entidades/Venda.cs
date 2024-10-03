@@ -8,6 +8,7 @@ public record Venda : IEntity
   public Guid IdCliente { get; init; }
   public Guid IdFilial { get; init; }
   public bool Cancelado { get; init; }
+  public string MotivoCancelamento { get; init; } = "";
 }
 
 public record VendaCompletaDto
@@ -49,4 +50,9 @@ public record CriarVendaDto
 {
   public Guid IdCliente { get; init; }
   public Guid IdFilial { get; init; }
+}
+
+public record CancelarVendaDto
+{
+  public required string MotivoCancelamento { get; init; }
 }
