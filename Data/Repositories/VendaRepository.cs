@@ -6,10 +6,47 @@ namespace Data.Repositories;
 public class VendaRepository : BaseRepository<Venda>, IVendaRepository
 {
   private readonly IVendaProdutoRepository vendaProdutoRepository;
+  private readonly INumeroVendaRepository numeroVendaRepository;
 
-  public VendaRepository(IVendaProdutoRepository vendaProdutoRepository)
+  public VendaRepository(IVendaProdutoRepository vendaProdutoRepository,
+  INumeroVendaRepository numeroVendaRepository)
   {
     this.vendaProdutoRepository = vendaProdutoRepository;
+    this.numeroVendaRepository = numeroVendaRepository;
+  }
+
+  public async Task<Venda> AdicionarDeDto(CriarVendaDto criarVendaDto)
+  {
+    using var transação = DbEmMemoria.IniciarTransação();
+
+    try
+    {
+      var numeroVenda = await numeroVendaRepository.GerarNumeroVenda();
+
+      if (numeroVenda is null)
+        throw new Exception("Não foi possívle criar numero de venda.");
+
+      var venda = new Venda
+      {
+        Id = Guid.NewGuid(),
+        IdNumero = numeroVenda.Id,
+        Data = DateTime.Now,
+        IdCliente = criarVendaDto.IdCliente,
+        IdFilial = criarVendaDto.IdFilial,
+        Cancelado = false
+      };
+
+      DbEmMemoria.Dados<Venda>()[venda.Id] = venda;
+      transação.Completar();
+
+      return venda;
+    }
+    catch (Exception)
+    {
+      transação.Cancelar();
+    }
+
+    throw new Exception("Não foi possívle criar venda.");
   }
 
   public override async Task<bool> DeletarAsync(Guid id)
@@ -48,7 +85,11 @@ public class VendaRepository : BaseRepository<Venda>, IVendaRepository
     .FirstOrDefault(filial => filial.Id == venda.IdFilial)
     ?? throw new InvalidOperationException("Filial deve existir uma venda");
 
-    return VendaCompletaDto.ObterDeVenda(venda, vendaProdutoDtos.ToList(), cliente, filial);
+    var numeroVenda = DbEmMemoria.Dados<NumeroVenda>().Values
+    .FirstOrDefault(numero => numero.Id == venda.IdNumero)
+    ?? throw new InvalidOperationException("Filial deve existir uma venda");
+
+    return VendaCompletaDto.ObterDeVenda(venda, vendaProdutoDtos.ToList(), cliente, filial, numeroVenda);
   }
 
   private Task DeletarVenda(Guid idVenda, IEnumerable<VendaProduto> vendaProdutos)

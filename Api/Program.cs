@@ -1,6 +1,7 @@
 using Data.Repositories;
 using DataAbstraction.Repositories;
 using Domain.Entidades;
+using Microsoft.AspNetCore.Diagnostics;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,10 +11,22 @@ builder.Services.AddScoped<IRepository<Venda>, VendaRepository>();
 builder.Services.AddScoped<IVendaProdutoRepository, VendaProdutoRepository>();
 builder.Services.AddScoped<IRepository<VendaProduto>, VendaProdutoRepository>();
 builder.Services.AddScoped<IRepository<Produto>, ProdutoRepository>();
+builder.Services.AddScoped<INumeroVendaRepository, NumeroVendaRepository>();
 
 var app = builder.Build();
 
-app.MapGet("/", () => "Hello World!");
+app.UseExceptionHandler("/error");
+
+app.Map("/error", (HttpContext httpContext) =>
+{
+  var exception = httpContext.Features.Get<IExceptionHandlerFeature>()?.Error;
+
+  // Logar exception
+
+  return Results.Problem("Houve um erro na operação.", statusCode: 500);
+});
+
+app.MapGet("/", () => "Bem-vindo à API de vendas!");
 
 app.MapGet("/vendas", async (IRepository<Venda> repo) =>
 {
@@ -36,10 +49,10 @@ app.MapGet("/vendaCompleta/{id}", async (Guid id, IVendaRepository repo) =>
 })
 .WithName("ObterVendaCompletaPorId");
 
-app.MapPost("/vendas", async (Venda novaVenda, IRepository<Venda> repo) =>
+app.MapPost("/vendas", async (CriarVendaDto novaVenda, IVendaRepository repo) =>
 {
-  await repo.AdicionarAsync(novaVenda);
-  return Results.Created($"/vendas/{novaVenda.Id}", novaVenda);
+  var vendaCriada = await repo.AdicionarDeDto(novaVenda);
+  return Results.Created($"/vendas/{vendaCriada.Id}", vendaCriada);
 })
 .WithName("CriarVenda");
 

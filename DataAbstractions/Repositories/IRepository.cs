@@ -21,4 +21,10 @@ public interface IVendaProdutoRepository : IRepository<VendaProduto>
 public interface IVendaRepository : IRepository<Venda>
 {
   Task<VendaCompletaDto?> ObterCompletaPorIdAsync(Guid id);
+  Task<Venda> AdicionarDeDto(CriarVendaDto criarVendaDto);
+}
+
+public interface INumeroVendaRepository : IRepository<NumeroVenda>
+{
+  Task<NumeroVenda?> GerarNumeroVenda();
 }

@@ -3,7 +3,7 @@
 public record Venda : IEntity
 {
   public Guid Id { get; init; }
-  public required string Numero { get; init; }
+  public Guid IdNumero { get; init; }
   public DateTime Data { get; init; }
   public Guid IdCliente { get; init; }
   public Guid IdFilial { get; init; }
@@ -25,7 +25,8 @@ public record VendaCompletaDto
     Venda venda,
     IList<VendaProdutoDto> vendaProdutoDtos,
     Cliente cliente,
-    Filial filial)
+    Filial filial,
+    NumeroVenda numeroVenda)
   {
     var valorTotalDaVenda = vendaProdutoDtos
     .Sum(vendaProtudoDto => vendaProtudoDto.ValorTotalVendaProduto);
@@ -33,7 +34,7 @@ public record VendaCompletaDto
     return new VendaCompletaDto
     {
       Id = venda.Id,
-      Numero = venda.Numero,
+      Numero = $"{numeroVenda.Mes}-{numeroVenda.Ano}-{numeroVenda.Numero}",
       Data = venda.Data,
       Cliente = cliente,
       Filial = filial,
@@ -42,4 +43,10 @@ public record VendaCompletaDto
       ValorTotalDaVenda = valorTotalDaVenda
     };
   }
+}
+
+public record CriarVendaDto
+{
+  public Guid IdCliente { get; init; }
+  public Guid IdFilial { get; init; }
 }
