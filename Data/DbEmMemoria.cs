@@ -63,10 +63,12 @@ internal class DbEmMemoria
     //Filial usada pra criar uma venda no postman
     var filial2 = new Filial { Id = Guid.Parse("49bc7d4f-630f-4532-97c7-67543addf605"), Nome = "Filial Zona Sul" };
 
-    var produto1 = new Produto { Id = Guid.NewGuid(), ValorUnitario = 10.0, Nome = "Cadeira" };
-    var produto2 = new Produto { Id = Guid.NewGuid(), ValorUnitario = 20.0, Nome = "Mesa" };
-    var produto3 = new Produto { Id = Guid.NewGuid(), ValorUnitario = 20.0, Nome = "Armário" };
-    var produto4 = new Produto { Id = Guid.NewGuid(), ValorUnitario = 20.0, Nome = "Vaso" };
+    var produto1 = new Produto { Id = Guid.NewGuid(), ValorUnitario = 100.0, Nome = "Cadeira" };
+    var produto2 = new Produto { Id = Guid.NewGuid(), ValorUnitario = 200.0, Nome = "Mesa" };
+
+    //Produtos adicionados no postman
+    var produto3 = new Produto { Id = Guid.Parse("a78a4f84-29f3-48f7-9c63-8124a43f578e"), ValorUnitario = 150.5, Nome = "Armário" };
+    var produto4 = new Produto { Id = Guid.Parse("c4e1e43e-b798-4c7a-b204-5b0d6e0d6a9d"), ValorUnitario = 26.95, Nome = "Vaso" };
 
     var numeroVenda1 = new NumeroVenda { Id = Guid.NewGuid(), Ano = "2024", Mes = "04", Numero = 2 };
     var numeroVenda2 = new NumeroVenda { Id = Guid.NewGuid(), Ano = "2024", Mes = "05", Numero = 1 };

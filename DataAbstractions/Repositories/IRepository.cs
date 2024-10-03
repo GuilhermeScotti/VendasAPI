@@ -16,15 +16,17 @@ public interface IVendaProdutoRepository : IRepository<VendaProduto>
 {
   Task<IEnumerable<VendaProduto>> ObterPorIdVendaAsync(Guid idVenda);
   Task<IEnumerable<VendaProdutoDto>> ObterDtoPorIdVendaAsync(Guid idVenda);
+
+  Task VenderProdutosAsync(Guid idVenda, VenderProdutosDto venderProdutosDto);
 }
 
 public interface IVendaRepository : IRepository<Venda>
 {
   Task<VendaCompletaDto?> ObterCompletaPorIdAsync(Guid id);
-  Task<Venda> AdicionarDeDto(CriarVendaDto criarVendaDto);
+  Task<Venda> AdicionarDeDtoAsync(CriarVendaDto criarVendaDto);
 }
 
 public interface INumeroVendaRepository : IRepository<NumeroVenda>
 {
-  Task<NumeroVenda?> GerarNumeroVenda();
+  Task<NumeroVenda?> GerarNumeroVendaAsync();
 }

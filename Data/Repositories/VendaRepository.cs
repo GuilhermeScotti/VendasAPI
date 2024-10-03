@@ -15,13 +15,13 @@ public class VendaRepository : BaseRepository<Venda>, IVendaRepository
     this.numeroVendaRepository = numeroVendaRepository;
   }
 
-  public async Task<Venda> AdicionarDeDto(CriarVendaDto criarVendaDto)
+  public async Task<Venda> AdicionarDeDtoAsync(CriarVendaDto criarVendaDto)
   {
     using var transação = DbEmMemoria.IniciarTransação();
 
     try
     {
-      var numeroVenda = await numeroVendaRepository.GerarNumeroVenda();
+      var numeroVenda = await numeroVendaRepository.GerarNumeroVendaAsync();
 
       if (numeroVenda is null)
         throw new Exception("Não foi possívle criar numero de venda.");

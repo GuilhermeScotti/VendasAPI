@@ -41,3 +41,15 @@ public record VendaProdutoDto
     };
   }
 }
+
+public record VenderProdutosDto
+{
+  public required VenderProdutoDto[] VenderProdutos { get; init; }
+}
+
+public record VenderProdutoDto
+{
+  public Guid IdProduto { get; init; }
+  public int Quantidade { get; init; }
+  public double PorcentagemDesconto { get; init; }
+}
