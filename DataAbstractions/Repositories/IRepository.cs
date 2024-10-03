@@ -15,6 +15,7 @@ where TEntity : IEntity
 public interface IVendaProdutoRepository : IRepository<VendaProduto>
 {
   Task<IEnumerable<VendaProduto>> ObterPorIdVendaAsync(Guid idVenda);
+  Task<IEnumerable<VendaProdutoDto>> ObterDtoPorIdVendaAsync(Guid idVenda);
 }
 
 public interface IVendaRepository : IRepository<Venda>

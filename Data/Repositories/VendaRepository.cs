@@ -38,18 +38,17 @@ public class VendaRepository : BaseRepository<Venda>, IVendaRepository
 
     if (venda is null) return null;
 
-    var vendaProdutos = await vendaProdutoRepository.ObterPorIdVendaAsync(id);
+    var vendaProdutoDtos = await vendaProdutoRepository.ObterDtoPorIdVendaAsync(id);
 
-    return new VendaCompletaDto
-    {
-      Id = venda.Id,
-      Numero = venda.Numero,
-      Data = venda.Data,
-      IdCliente = venda.IdCliente,
-      IdFilial = venda.IdFilial,
-      Cancelado = venda.Cancelado,
-      Produtos = vendaProdutos.ToList()
-    };
+    var cliente = DbEmMemoria.Dados<Cliente>().Values
+    .FirstOrDefault(cliente => cliente.Id == venda.IdCliente)
+    ?? throw new InvalidOperationException("Cliente deve existir uma venda");
+
+    var filial = DbEmMemoria.Dados<Filial>().Values
+    .FirstOrDefault(filial => filial.Id == venda.IdFilial)
+    ?? throw new InvalidOperationException("Filial deve existir uma venda");
+
+    return VendaCompletaDto.ObterDeVenda(venda, vendaProdutoDtos.ToList(), cliente, filial);
   }
 
   private Task DeletarVenda(Guid idVenda, IEnumerable<VendaProduto> vendaProdutos)
