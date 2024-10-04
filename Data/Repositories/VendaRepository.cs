@@ -44,9 +44,8 @@ public class VendaRepository : BaseRepository<Venda>, IVendaRepository
     catch (Exception)
     {
       transação.Cancelar();
+      throw;
     }
-
-    throw new Exception("Não foi possívle criar venda.");
   }
 
   public override async Task<bool> DeletarAsync(Guid id)
@@ -63,7 +62,7 @@ public class VendaRepository : BaseRepository<Venda>, IVendaRepository
     catch (Exception)
     {
       transação.Cancelar();
-      //log
+      throw;
     }
 
     return true;

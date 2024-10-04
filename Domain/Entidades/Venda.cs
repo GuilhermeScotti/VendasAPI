@@ -30,6 +30,7 @@ public record VendaCompletaDto
     NumeroVenda numeroVenda)
   {
     var valorTotalDaVenda = vendaProdutoDtos
+    .Where(vendaProduto => vendaProduto.Cancelado == false)
     .Sum(vendaProtudoDto => vendaProtudoDto.ValorTotalVendaProduto);
 
     return new VendaCompletaDto
