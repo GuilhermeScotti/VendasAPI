@@ -145,7 +145,7 @@ internal class DbEmMemoria
 
     var vendaProduto4 = new VendaProduto
     {
-      Id = Guid.NewGuid(),
+      Id = Guid.Parse("6dbb267a-5cee-4ba8-bbf3-f165660141c5"),
       IdVenda = venda2.Id,
       IdProduto = produto4.Id,
       Quantidade = 7,

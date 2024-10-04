@@ -104,7 +104,30 @@ app.MapPost("/vendas/{id}/produtos", async (Guid id, VenderProdutosDto venderPro
 })
 .WithName("AdicionarProdutosVenda");
 
+app.MapPatch("/vendas/cancelarVendaProduto/{id}", async (
+  Guid id,
+  IVendaProdutoRepository repo,
+  IRepository<Venda> vendaRepository,
+  IServiçoDeMensageria mensageria) =>
+{
+  var vendaProduto = await repo.ObterPorIdAsync(id);
 
+  if (vendaProduto is null) return Results.NotFound();
+
+  var venda = await vendaRepository.ObterPorIdAsync(vendaProduto.IdVenda);
+
+  if (venda?.Cancelado ?? false)
+    return Results.Problem("Venda cancelada. Não é possível cancelar produto.");
+
+  await repo.AtualizarAsync(vendaProduto with
+  {
+    Cancelado = true,
+  });
+
+  await mensageria.ItemCancelado();
+  return Results.NoContent();
+})
+.WithName("CancelarVendaProduto");
 
 app.MapDelete("/vendas/{id}", async (Guid id, IRepository<Venda> repo, IServiçoDeMensageria mensageria) =>
 {
