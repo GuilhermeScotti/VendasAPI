@@ -2,8 +2,16 @@ using Data.Repositories;
 using DataAbstraction.Repositories;
 using Domain.Entidades;
 using Microsoft.AspNetCore.Diagnostics;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .CreateLogger();
+
+builder.Logging.ClearProviders();
+builder.Logging.AddSerilog();
 
 builder.Services.AddEndpointsApiExplorer();
 
@@ -24,7 +32,14 @@ app.Map("/error", (HttpContext httpContext) =>
 {
   var exception = httpContext.Features.Get<IExceptionHandlerFeature>()?.Error;
 
-  // Logar exception
+  if (exception != null)
+  {
+    Log.Error(exception, "Erro capturado em /error");
+  }
+  else
+  {
+    Log.Error("Erro desconhecido.");
+  }
 
   var mensagem = exception?.Message ?? "desconhecido";
 
@@ -59,6 +74,7 @@ app.MapPost("/vendas", async (CriarVendaDto novaVenda, IVendaRepository repo, IS
   var vendaCriada = await repo.AdicionarDeDtoAsync(novaVenda);
 
   await mensageria.CompraCriada();
+  Log.Information("Venda criada com sucesso: {VendaId}", vendaCriada.Id);
   return Results.Created($"/vendas/{vendaCriada.Id}", vendaCriada);
 })
 .WithName("CriarVenda");
@@ -68,10 +84,16 @@ app.MapPatch("/vendas/{id}/cancelar", async (Guid id, CancelarVendaDto atualizar
   var venda = await repo.ObterPorIdAsync(id);
 
   if (venda is null)
+  {
+    Log.Warning("Cancelando Venda com ID {VendaId} não encontrada.", id);
     return Results.NotFound();
+  }
 
   if (venda.Cancelado)
+  {
+    Log.Warning("Tentativa de cancelar a venda com ID {VendaId} que já está cancelada.", id);
     return Results.Problem("Venda já cancelada.");
+  }
 
   await repo.AtualizarAsync(venda with
   {
@@ -80,6 +102,9 @@ app.MapPatch("/vendas/{id}/cancelar", async (Guid id, CancelarVendaDto atualizar
   });
 
   await mensageria.CompraCancelada();
+
+  Log.Information("Venda com ID {VendaId} cancelada com sucesso.", id);
+
   return Results.NoContent();
 })
 .WithName("CancelarVenda");
@@ -92,14 +117,21 @@ app.MapPost("/vendas/{id}/produtos", async (Guid id, VenderProdutosDto venderPro
   var venda = await vendaRepo.ObterPorIdAsync(id);
 
   if (venda is null)
+  {
+    Log.Warning("Adicionando produtos em Venda com ID {VendaId} não encontrada.", id);
     return Results.NotFound();
+  }
 
   if (venda.Cancelado)
+  {
+    Log.Warning("Tentativa de adicionar produtos à venda com ID {VendaId} que já está cancelada.", id);
     return Results.Problem("Venda cancelada. Não é possível adicionar produtos.");
+  }
 
   await repo.VenderProdutosAsync(id, venderProdutosDto);
 
   await mensageria.CompraAlterada();
+  Log.Information("Adicionando produtos à venda com ID {VendaId}", id);
   return Results.NoContent();
 })
 .WithName("AdicionarProdutosVenda");
@@ -112,12 +144,19 @@ app.MapPatch("/vendas/cancelarVendaProduto/{id}", async (
 {
   var vendaProduto = await repo.ObterPorIdAsync(id);
 
-  if (vendaProduto is null) return Results.NotFound();
+  if (vendaProduto is null)
+  {
+    Log.Warning("Tentativa de cancelar Produto com ID {ProdutoId} não encontrado.", id);
+    return Results.NotFound();
+  }
 
   var venda = await vendaRepository.ObterPorIdAsync(vendaProduto.IdVenda);
 
   if (venda?.Cancelado ?? false)
+  {
+    Log.Warning("Tentativa de cancelar o produto com ID {ProdutoId} em uma venda que já está cancelada.", id);
     return Results.Problem("Venda cancelada. Não é possível cancelar produto.");
+  }
 
   await repo.AtualizarAsync(vendaProduto with
   {
@@ -125,6 +164,7 @@ app.MapPatch("/vendas/cancelarVendaProduto/{id}", async (
   });
 
   await mensageria.ItemCancelado();
+  Log.Information("Produto com ID {ProdutoId} cancelado com sucesso.", id);
   return Results.NoContent();
 })
 .WithName("CancelarVendaProduto");
@@ -134,11 +174,14 @@ app.MapDelete("/vendas/{id}", async (Guid id, IRepository<Venda> repo, IServiço
   var deleted = await repo.DeletarAsync(id);
 
   if (deleted)
+  {
     await mensageria.CompraExcluida();
-  else
-    return Results.Problem("Não foi possível excluir venda.");
+    Log.Information("Venda com ID {VendaId} excluída com sucesso.", id);
+    return Results.NoContent();
+  }
 
-  return deleted ? Results.NoContent() : Results.NotFound();
+  Log.Warning("Não foi possível excluir a venda com ID {VendaId}.", id);
+  return Results.Problem("Não foi possível excluir venda.");
 })
 .WithName("DeletarVenda");
 
