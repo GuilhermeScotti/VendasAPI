@@ -17,7 +17,7 @@ public class VendaRepository : BaseRepository<Venda>, IVendaRepository
 
   public async Task<Venda> AdicionarDeDtoAsync(CriarVendaDto criarVendaDto)
   {
-    using var transação = DbEmMemoria.IniciarTransação();
+    using var transação = DadosParaTeste.IniciarTransação();
 
     try
     {
@@ -36,7 +36,7 @@ public class VendaRepository : BaseRepository<Venda>, IVendaRepository
         Cancelado = false
       };
 
-      DbEmMemoria.Dados<Venda>()[venda.Id] = venda;
+      DadosParaTeste.Dados<Venda>()[venda.Id] = venda;
       transação.Completar();
 
       return venda;
@@ -52,7 +52,7 @@ public class VendaRepository : BaseRepository<Venda>, IVendaRepository
   {
     var vendaProdutos = await vendaProdutoRepository.ObterPorIdVendaAsync(id);
 
-    using var transação = DbEmMemoria.IniciarTransação();
+    using var transação = DadosParaTeste.IniciarTransação();
 
     try
     {
@@ -76,15 +76,15 @@ public class VendaRepository : BaseRepository<Venda>, IVendaRepository
 
     var vendaProdutoDtos = await vendaProdutoRepository.ObterDtoPorIdVendaAsync(id);
 
-    var cliente = DbEmMemoria.Dados<Cliente>().Values
+    var cliente = DadosParaTesteExternal.Dados<Cliente>().Values
     .FirstOrDefault(cliente => cliente.Id == venda.IdCliente)
     ?? throw new InvalidOperationException("Cliente deve existir uma venda");
 
-    var filial = DbEmMemoria.Dados<Filial>().Values
+    var filial = DadosParaTesteExternal.Dados<Filial>().Values
     .FirstOrDefault(filial => filial.Id == venda.IdFilial)
     ?? throw new InvalidOperationException("Filial deve existir uma venda");
 
-    var numeroVenda = DbEmMemoria.Dados<NumeroVenda>().Values
+    var numeroVenda = DadosParaTeste.Dados<NumeroVenda>().Values
     .FirstOrDefault(numero => numero.Id == venda.IdNumero)
     ?? throw new InvalidOperationException("Filial deve existir uma venda");
 
@@ -93,14 +93,14 @@ public class VendaRepository : BaseRepository<Venda>, IVendaRepository
 
   private Task DeletarVenda(Guid idVenda, IEnumerable<VendaProduto> vendaProdutos)
   {
-    if (!DbEmMemoria.Dados<Venda>().TryRemove(idVenda, out _))
+    if (!DadosParaTeste.Dados<Venda>().TryRemove(idVenda, out _))
     {
       throw new Exception("Falha ao deletar venda");
     }
 
     foreach (var vendaProduto in vendaProdutos)
     {
-      if (!DbEmMemoria.Dados<VendaProduto>().TryRemove(vendaProduto.Id, out _))
+      if (!DadosParaTeste.Dados<VendaProduto>().TryRemove(vendaProduto.Id, out _))
       {
         throw new Exception("Falha ao deletar venda produto");
       }

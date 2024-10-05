@@ -7,7 +7,7 @@ public class VendaProdutoRepository : BaseRepository<VendaProduto>, IVendaProdut
 {
   public Task<IEnumerable<VendaProduto>> ObterPorIdVendaAsync(Guid idVenda)
   {
-    var vendaProdutos = DbEmMemoria.Dados<VendaProduto>()
+    var vendaProdutos = DadosParaTeste.Dados<VendaProduto>()
     .Values
     .Where(vendaProd => vendaProd.IdVenda == idVenda);
 
@@ -16,14 +16,14 @@ public class VendaProdutoRepository : BaseRepository<VendaProduto>, IVendaProdut
 
   public Task<IEnumerable<VendaProdutoDto>> ObterDtoPorIdVendaAsync(Guid idVenda)
   {
-    var vendaProdutos = DbEmMemoria.Dados<VendaProduto>()
+    var vendaProdutos = DadosParaTeste.Dados<VendaProduto>()
     .Values
     .Where(vendaProd => vendaProd.IdVenda == idVenda);
 
     var vendaProdutoDtos = vendaProdutos
     .Select(vendaProduto =>
     {
-      var produto = DbEmMemoria.Dados<Produto>().Values
+      var produto = DadosParaTesteExternal.Dados<Produto>().Values
       .FirstOrDefault(produto => produto.Id == vendaProduto.IdProduto)
       ?? throw new InvalidOperationException("Produto deve existir em uma venda de produto");
 
@@ -35,7 +35,7 @@ public class VendaProdutoRepository : BaseRepository<VendaProduto>, IVendaProdut
 
   public async Task VenderProdutosAsync(Guid idVenda, VenderProdutosDto venderProdutosDto)
   {
-    using var transação = DbEmMemoria.IniciarTransação();
+    using var transação = DadosParaTeste.IniciarTransação();
 
     try
     {
@@ -54,7 +54,7 @@ public class VendaProdutoRepository : BaseRepository<VendaProduto>, IVendaProdut
   {
     foreach (var vendaProdutoDto in venderProdutosDto.VenderProdutos)
     {
-      var produtoExiste = DbEmMemoria.Dados<Produto>().Values
+      var produtoExiste = DadosParaTesteExternal.Dados<Produto>().Values
       .FirstOrDefault(produto => produto.Id == vendaProdutoDto.IdProduto) is not null;
 
       if (!produtoExiste)

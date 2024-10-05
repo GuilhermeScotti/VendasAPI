@@ -13,7 +13,7 @@ public class NumeroVendaRepository : BaseRepository<NumeroVenda>, INumeroVendaRe
 
     do
     {
-      using var transação = DbEmMemoria.IniciarTransação();
+      using var transação = DadosParaTeste.IniciarTransação();
 
       try
       {
@@ -29,7 +29,7 @@ public class NumeroVendaRepository : BaseRepository<NumeroVenda>, INumeroVendaRe
           Numero = numeroGerado
         };
 
-        DbEmMemoria.Dados<NumeroVenda>()[numeroVenda.Id] = numeroVenda;
+        DadosParaTeste.Dados<NumeroVenda>()[numeroVenda.Id] = numeroVenda;
 
         transação.Completar();
         return Task.FromResult<NumeroVenda?>(numeroVenda);
@@ -47,7 +47,7 @@ public class NumeroVendaRepository : BaseRepository<NumeroVenda>, INumeroVendaRe
 
   private int GerarNumero(string mes, string ano)
   {
-    var ultimoNumeroVenda = DbEmMemoria.Dados<NumeroVenda>().Values
+    var ultimoNumeroVenda = DadosParaTeste.Dados<NumeroVenda>().Values
     .Where(numero => numero.Mes == mes && numero.Ano == ano)
     .OrderByDescending(venda => venda.Numero)
     .Select(venda => venda.Numero)

@@ -19,7 +19,7 @@ builder.Services.AddScoped<IVendaRepository, VendaRepository>();
 builder.Services.AddScoped<IRepository<Venda>, VendaRepository>();
 builder.Services.AddScoped<IVendaProdutoRepository, VendaProdutoRepository>();
 builder.Services.AddScoped<IRepository<VendaProduto>, VendaProdutoRepository>();
-builder.Services.AddScoped<IRepository<Produto>, ProdutoRepository>();
+builder.Services.AddScoped<IReadOnlyRepository<Produto>, ProdutoRepository>();
 builder.Services.AddScoped<INumeroVendaRepository, NumeroVendaRepository>();
 
 builder.Services.AddSingleton<IServiçoDeMensageria, ServiçoDeMensageria>();
