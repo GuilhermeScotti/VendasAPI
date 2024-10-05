@@ -1,7 +1,7 @@
 
 namespace Domain.Entidades;
 
-public record NumeroVenda : IEntity
+public record NumeroVenda : ILocalEntity
 {
   public Guid Id { get; init; }
   public required string Ano { get; init; }

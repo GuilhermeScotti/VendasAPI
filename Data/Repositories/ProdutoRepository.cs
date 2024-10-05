@@ -2,6 +2,6 @@ using Domain.Entidades;
 
 namespace Data.Repositories;
 
-public class ProdutoRepository : BaseRepository<Produto>
+public class ProdutoRepository : BaseExternalReadOnlyRepository<Produto>
 {
 }

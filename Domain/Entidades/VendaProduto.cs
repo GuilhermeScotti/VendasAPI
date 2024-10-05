@@ -1,6 +1,6 @@
 namespace Domain.Entidades;
 
-public record VendaProduto : IEntity
+public record VendaProduto : ILocalEntity
 {
   public Guid Id { get; init; }
   public Guid IdVenda { get; init; }
