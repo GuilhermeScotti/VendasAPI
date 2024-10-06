@@ -1,41 +1,48 @@
 public class ServiçoDeMensageria : IServiçoDeMensageria
 {
-  public Task CompraCriada()
+  public Task VendaCriada(Guid IdVenda)
   {
-    Console.WriteLine("*** Compra criada ***");
+    Console.WriteLine($"*** Venda criada: {IdVenda} ***");
     return Task.CompletedTask;
   }
 
-  public Task CompraAlterada()
+  public Task VendaAlterada(Guid IdVenda)
   {
-    Console.WriteLine("*** Compra alterada ***");
+    Console.WriteLine($"*** Venda alterada: {IdVenda} ***");
     return Task.CompletedTask;
   }
 
-  public Task CompraCancelada()
+  public Task VendaCancelada(Guid IdVenda)
   {
-    Console.WriteLine("*** Compra cancelada ***");
+    Console.WriteLine($"*** Venda cancelada: {IdVenda} ***");
     return Task.CompletedTask;
   }
 
-  public Task ItemCancelado()
+  public Task VendaFechada(Guid IdVenda)
   {
-    Console.WriteLine("*** Item cancelado ***");
+    Console.WriteLine($"*** Venda fechada: {IdVenda} ***");
     return Task.CompletedTask;
   }
 
-  public Task CompraExcluida()
+  public Task ItemCancelado(Guid IdProduto)
   {
-    Console.WriteLine("*** Item cancelado ***");
+    Console.WriteLine($"*** Item cancelado: {IdProduto} ***");
+    return Task.CompletedTask;
+  }
+
+  public Task VendaExcluida(Guid IdVenda)
+  {
+    Console.WriteLine($"*** Venda excluída: {IdVenda} ***");
     return Task.CompletedTask;
   }
 }
 
 public interface IServiçoDeMensageria
 {
-  Task CompraCriada();
-  Task CompraAlterada();
-  Task CompraCancelada();
-  Task ItemCancelado();
-  Task CompraExcluida();
+  Task VendaCriada(Guid IdVenda);
+  Task VendaAlterada(Guid IdVenda);
+  Task VendaCancelada(Guid IdVenda);
+  Task VendaFechada(Guid IdVenda);
+  Task ItemCancelado(Guid IdProduto);
+  Task VendaExcluida(Guid IdVenda);
 }

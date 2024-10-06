@@ -12,9 +12,9 @@ internal class DadosParaTesteExternal
   }
 
 
-  public static ConcurrentDictionary<Guid, Cliente> Clientes { get; } = new();
-  public static ConcurrentDictionary<Guid, Filial> Filiais { get; } = new();
-  public static ConcurrentDictionary<Guid, Produto> Produtos { get; } = new();
+  private static ConcurrentDictionary<Guid, Cliente> Clientes { get; } = new();
+  private static ConcurrentDictionary<Guid, Filial> Filiais { get; } = new();
+  private static ConcurrentDictionary<Guid, Produto> Produtos { get; } = new();
 
   public static IReadOnlyDictionary<Guid, T> Dados<T>()
   where T : IExternalEntity
@@ -85,9 +85,9 @@ internal class DadosParaTeste
     return new TransaçãoFake();
   }
 
-  public static ConcurrentDictionary<Guid, Venda> Vendas { get; } = new();
-  public static ConcurrentDictionary<Guid, NumeroVenda> NumeroVendas { get; } = new();
-  public static ConcurrentDictionary<Guid, VendaProduto> VendaProdutos { get; } = new();
+  private static ConcurrentDictionary<Guid, Venda> Vendas { get; } = new();
+  private static ConcurrentDictionary<Guid, NumeroVenda> NumeroVendas { get; } = new();
+  private static ConcurrentDictionary<Guid, VendaProduto> VendaProdutos { get; } = new();
 
   public static ConcurrentDictionary<Guid, T> Dados<T>()
   where T : ILocalEntity
@@ -109,15 +109,19 @@ internal class DadosParaTeste
     NumeroVendas[numeroVenda1.Id] = numeroVenda1;
     NumeroVendas[numeroVenda2.Id] = numeroVenda2;
 
+    var cliente = DadosParaTesteExternal.Dados<Cliente>().Values.ElementAt(0);
+
     var venda1 = new Venda
     {
       //Venda deletada no postman
       Id = Guid.Parse("e9ec29f8-d539-4c9f-9c0b-5a7d585860dc"),
       IdNumero = numeroVenda1.Id,
       Data = DateTime.UtcNow,
-      IdCliente = DadosParaTesteExternal.Clientes.Values.ElementAt(0).Id,
-      IdFilial = DadosParaTesteExternal.Filiais.Values.ElementAt(0).Id,
-      Cancelado = false
+      IdCliente = DadosParaTesteExternal.Dados<Cliente>().Values.ElementAt(0).Id,
+      NomeCliente = DadosParaTesteExternal.Dados<Cliente>().Values.ElementAt(0).Nome,
+      IdFilial = DadosParaTesteExternal.Dados<Filial>().Values.ElementAt(0).Id,
+      NomeFilial = DadosParaTesteExternal.Dados<Filial>().Values.ElementAt(0).Nome,
+      Numero = $"{numeroVenda1.Mes}-{numeroVenda1.Ano}-{numeroVenda1.Numero}"
     };
     Vendas[venda1.Id] = venda1;
 
@@ -125,10 +129,10 @@ internal class DadosParaTeste
     {
       Id = Guid.NewGuid(),
       IdVenda = venda1.Id,
-      IdProduto = DadosParaTesteExternal.Produtos.Values.ElementAt(0).Id,
+      IdProduto = DadosParaTesteExternal.Dados<Produto>().Values.ElementAt(0).Id,
       Quantidade = 2,
       PorcentagemDesconto = 0,
-      Cancelado = false
+      ValorUnitario = DadosParaTesteExternal.Dados<Produto>().Values.ElementAt(0).ValorUnitario
     };
     VendaProdutos[vendaProduto1.Id] = vendaProduto1;
 
@@ -138,8 +142,11 @@ internal class DadosParaTeste
       Id = Guid.Parse("5b165226-bf9a-4960-8a88-a99f9fe16f5a"),
       IdNumero = numeroVenda2.Id,
       Data = DateTime.UtcNow.AddDays(-1),
-      IdCliente = DadosParaTesteExternal.Clientes.Values.ElementAt(1).Id,
-      IdFilial = DadosParaTesteExternal.Filiais.Values.ElementAt(1).Id,
+      IdCliente = DadosParaTesteExternal.Dados<Cliente>().Values.ElementAt(1).Id,
+      NomeCliente = DadosParaTesteExternal.Dados<Cliente>().Values.ElementAt(1).Nome,
+      IdFilial = DadosParaTesteExternal.Dados<Filial>().Values.ElementAt(1).Id,
+      NomeFilial = DadosParaTesteExternal.Dados<Filial>().Values.ElementAt(1).Nome,
+      Numero = $"{numeroVenda2.Mes}-{numeroVenda2.Ano}-{numeroVenda2.Numero}"
     };
     Vendas[venda2.Id] = venda2;
 
@@ -147,10 +154,10 @@ internal class DadosParaTeste
     {
       Id = Guid.NewGuid(),
       IdVenda = venda2.Id,
-      IdProduto = DadosParaTesteExternal.Produtos.Values.ElementAt(1).Id,
+      IdProduto = DadosParaTesteExternal.Dados<Produto>().Values.ElementAt(1).Id,
       Quantidade = 1,
       PorcentagemDesconto = 7.5,
-      Cancelado = false
+      ValorUnitario = DadosParaTesteExternal.Dados<Produto>().Values.ElementAt(1).ValorUnitario
     };
     VendaProdutos[vendaProduto2.Id] = vendaProduto2;
 
@@ -158,10 +165,10 @@ internal class DadosParaTeste
     {
       Id = Guid.NewGuid(),
       IdVenda = venda2.Id,
-      IdProduto = DadosParaTesteExternal.Produtos.Values.ElementAt(2).Id,
+      IdProduto = DadosParaTesteExternal.Dados<Produto>().Values.ElementAt(2).Id,
       Quantidade = 3,
       PorcentagemDesconto = 0,
-      Cancelado = false
+      ValorUnitario = DadosParaTesteExternal.Dados<Produto>().Values.ElementAt(2).ValorUnitario
     };
     VendaProdutos[vendaProduto3.Id] = vendaProduto3;
 
@@ -169,10 +176,10 @@ internal class DadosParaTeste
     {
       Id = Guid.Parse("6dbb267a-5cee-4ba8-bbf3-f165660141c5"),
       IdVenda = venda2.Id,
-      IdProduto = DadosParaTesteExternal.Produtos.Values.ElementAt(3).Id,
+      IdProduto = DadosParaTesteExternal.Dados<Produto>().Values.ElementAt(3).Id,
       Quantidade = 7,
       PorcentagemDesconto = 3.5,
-      Cancelado = false
+      ValorUnitario = DadosParaTesteExternal.Dados<Produto>().Values.ElementAt(3).ValorUnitario
     };
     VendaProdutos[vendaProduto4.Id] = vendaProduto4;
   }
