@@ -2,13 +2,21 @@
 
 public record Venda : ILocalEntity
 {
-  public Guid Id { get; init; }
-  public Guid IdNumero { get; init; }
-  public DateTime Data { get; init; }
-  public Guid IdCliente { get; init; }
-  public Guid IdFilial { get; init; }
+  public required Guid Id { get; init; }
+  public required Guid IdNumero { get; init; }
+  public required DateTime Data { get; init; }
+  public required Guid IdCliente { get; init; }
+  public required Guid IdFilial { get; init; }
+  public bool Fechada { get; set; }
   public bool Cancelado { get; init; }
   public string MotivoCancelamento { get; init; } = "";
+
+  //Desnormalizado de Cliente.Nome
+  public required string NomeCliente { get; init; }
+  //Desnormalizado de Filial.Nome
+  public required string NomeFilial { get; init; }
+  //Desnormalizado de Numero
+  public required string Numero { get; init; }
 }
 
 public record VendaCompletaDto
@@ -24,10 +32,7 @@ public record VendaCompletaDto
 
   public static VendaCompletaDto ObterDeVenda(
     Venda venda,
-    IList<VendaProdutoDto> vendaProdutoDtos,
-    Cliente cliente,
-    Filial filial,
-    NumeroVenda numeroVenda)
+    IList<VendaProdutoDto> vendaProdutoDtos)
   {
     var valorTotalDaVenda = vendaProdutoDtos
     .Where(vendaProduto => vendaProduto.Cancelado == false)
@@ -36,10 +41,18 @@ public record VendaCompletaDto
     return new VendaCompletaDto
     {
       Id = venda.Id,
-      Numero = $"{numeroVenda.Mes}-{numeroVenda.Ano}-{numeroVenda.Numero}",
+      Numero = venda.Numero,
       Data = venda.Data,
-      Cliente = cliente,
-      Filial = filial,
+      Cliente = new Cliente()
+      {
+        Id = venda.IdCliente,
+        Nome = venda.NomeCliente
+      },
+      Filial = new Filial()
+      {
+        Id = venda.IdFilial,
+        Nome = venda.NomeFilial
+      },
       Cancelado = venda.Cancelado,
       Produtos = vendaProdutoDtos,
       ValorTotalDaVenda = valorTotalDaVenda

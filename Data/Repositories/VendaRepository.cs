@@ -21,6 +21,16 @@ public class VendaRepository : BaseRepository<Venda>, IVendaRepository
 
     try
     {
+      var cliente = DadosParaTesteExternal.Dados<Cliente>()
+      .Values
+      .FirstOrDefault(cliente => cliente.Id == criarVendaDto.IdCliente)
+      ?? throw new Exception("Cliente inexistente.");
+
+      var filial = DadosParaTesteExternal.Dados<Filial>()
+      .Values
+      .FirstOrDefault(filial => filial.Id == criarVendaDto.IdFilial)
+      ?? throw new Exception("Filial inexistente."); ;
+
       var numeroVenda = await numeroVendaRepository.GerarNumeroVendaAsync();
 
       if (numeroVenda is null)
@@ -32,8 +42,10 @@ public class VendaRepository : BaseRepository<Venda>, IVendaRepository
         IdNumero = numeroVenda.Id,
         Data = DateTime.Now,
         IdCliente = criarVendaDto.IdCliente,
+        NomeCliente = cliente.Nome,
         IdFilial = criarVendaDto.IdFilial,
-        Cancelado = false
+        NomeFilial = filial.Nome,
+        Numero = $"{numeroVenda.Mes}-{numeroVenda.Ano}-{numeroVenda.Numero}"
       };
 
       DadosParaTeste.Dados<Venda>()[venda.Id] = venda;
@@ -76,19 +88,7 @@ public class VendaRepository : BaseRepository<Venda>, IVendaRepository
 
     var vendaProdutoDtos = await vendaProdutoRepository.ObterDtoPorIdVendaAsync(id);
 
-    var cliente = DadosParaTesteExternal.Dados<Cliente>().Values
-    .FirstOrDefault(cliente => cliente.Id == venda.IdCliente)
-    ?? throw new InvalidOperationException("Cliente deve existir uma venda");
-
-    var filial = DadosParaTesteExternal.Dados<Filial>().Values
-    .FirstOrDefault(filial => filial.Id == venda.IdFilial)
-    ?? throw new InvalidOperationException("Filial deve existir uma venda");
-
-    var numeroVenda = DadosParaTeste.Dados<NumeroVenda>().Values
-    .FirstOrDefault(numero => numero.Id == venda.IdNumero)
-    ?? throw new InvalidOperationException("Filial deve existir uma venda");
-
-    return VendaCompletaDto.ObterDeVenda(venda, vendaProdutoDtos.ToList(), cliente, filial, numeroVenda);
+    return VendaCompletaDto.ObterDeVenda(venda, vendaProdutoDtos.ToList());
   }
 
   private Task DeletarVenda(Guid idVenda, IEnumerable<VendaProduto> vendaProdutos)

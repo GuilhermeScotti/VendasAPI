@@ -2,31 +2,33 @@ namespace Domain.Entidades;
 
 public record VendaProduto : ILocalEntity
 {
-  public Guid Id { get; init; }
-  public Guid IdVenda { get; init; }
-  public Guid IdProduto { get; init; }
-  public int Quantidade { get; init; }
-  public double PorcentagemDesconto { get; init; }
+  public required Guid Id { get; init; }
+  public required Guid IdVenda { get; init; }
+  public required Guid IdProduto { get; init; }
+  public required int Quantidade { get; init; }
+  public required double PorcentagemDesconto { get; init; }
   public bool Cancelado { get; init; }
+
+  //Desnormalizado de Produto.ValorUnitário
+  public required double ValorUnitario { get; init; }
 }
 
 public record VendaProdutoDto
 {
-  public Guid Id { get; init; }
-  public Guid IdVenda { get; init; }
-  public Guid IdProduto { get; init; }
-  public int Quantidade { get; init; }
-  public double PorcentagemDesconto { get; init; }
-  public bool Cancelado { get; init; }
-  public double ValorUnitarioProduto { get; set; }
-  public double ValorTotalVendaProduto { get; set; }
+  public required Guid Id { get; init; }
+  public required Guid IdVenda { get; init; }
+  public required Guid IdProduto { get; init; }
+  public required int Quantidade { get; init; }
+  public required double PorcentagemDesconto { get; init; }
+  public required bool Cancelado { get; init; }
+  public required double ValorUnitarioProduto { get; set; }
+  public required double ValorTotalVendaProduto { get; set; }
 
   public static VendaProdutoDto ObterDeVendaProduto(
-    VendaProduto vendaProduto,
-    double valorUnitarioProduto)
+    VendaProduto vendaProduto)
   {
     double valorTotalVendaProduto =
-    valorUnitarioProduto * vendaProduto.Quantidade * (1 - (vendaProduto.PorcentagemDesconto / 100));
+    vendaProduto.ValorUnitario * vendaProduto.Quantidade * (1 - (vendaProduto.PorcentagemDesconto / 100));
 
     return new VendaProdutoDto
     {
@@ -36,7 +38,7 @@ public record VendaProdutoDto
       Quantidade = vendaProduto.Quantidade,
       PorcentagemDesconto = vendaProduto.PorcentagemDesconto,
       Cancelado = vendaProduto.Cancelado,
-      ValorUnitarioProduto = valorUnitarioProduto,
+      ValorUnitarioProduto = vendaProduto.ValorUnitario,
       ValorTotalVendaProduto = valorTotalVendaProduto
     };
   }

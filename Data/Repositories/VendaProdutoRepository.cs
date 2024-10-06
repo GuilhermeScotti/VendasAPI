@@ -20,15 +20,7 @@ public class VendaProdutoRepository : BaseRepository<VendaProduto>, IVendaProdut
     .Values
     .Where(vendaProd => vendaProd.IdVenda == idVenda);
 
-    var vendaProdutoDtos = vendaProdutos
-    .Select(vendaProduto =>
-    {
-      var produto = DadosParaTesteExternal.Dados<Produto>().Values
-      .FirstOrDefault(produto => produto.Id == vendaProduto.IdProduto)
-      ?? throw new InvalidOperationException("Produto deve existir em uma venda de produto");
-
-      return VendaProdutoDto.ObterDeVendaProduto(vendaProduto, produto.ValorUnitario);
-    });
+    var vendaProdutoDtos = vendaProdutos.Select(VendaProdutoDto.ObterDeVendaProduto);
 
     return Task.FromResult(vendaProdutoDtos);
   }
@@ -54,10 +46,10 @@ public class VendaProdutoRepository : BaseRepository<VendaProduto>, IVendaProdut
   {
     foreach (var vendaProdutoDto in venderProdutosDto.VenderProdutos)
     {
-      var produtoExiste = DadosParaTesteExternal.Dados<Produto>().Values
-      .FirstOrDefault(produto => produto.Id == vendaProdutoDto.IdProduto) is not null;
+      var produto = DadosParaTesteExternal.Dados<Produto>().Values
+      .FirstOrDefault(produto => produto.Id == vendaProdutoDto.IdProduto);
 
-      if (!produtoExiste)
+      if (produto is null)
         throw new Exception($"Produto {vendaProdutoDto.IdProduto} não existe");
 
       var novaVendaProduto = new VendaProduto
@@ -67,7 +59,7 @@ public class VendaProdutoRepository : BaseRepository<VendaProduto>, IVendaProdut
         IdProduto = vendaProdutoDto.IdProduto,
         Quantidade = vendaProdutoDto.Quantidade,
         PorcentagemDesconto = vendaProdutoDto.PorcentagemDesconto,
-        Cancelado = false
+        ValorUnitario = produto.ValorUnitario
       };
 
       await base.AdicionarAsync(novaVendaProduto);
