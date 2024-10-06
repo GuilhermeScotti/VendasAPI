@@ -5,6 +5,12 @@ namespace Data.Repositories;
 
 public class NumeroVendaRepository : BaseRepository<NumeroVenda>, INumeroVendaRepository
 {
+
+  public NumeroVendaRepository(ILocalDataContext<NumeroVenda> localDataContext)
+  : base(localDataContext)
+  {
+  }
+
   private const int MAX_TENTATIVAS = 5;
 
   public Task<NumeroVenda?> GerarNumeroVendaAsync()
@@ -18,7 +24,7 @@ public class NumeroVendaRepository : BaseRepository<NumeroVenda>, INumeroVendaRe
       try
       {
         var mes = DateTime.Now.Month.ToString("D2");
-        var ano = DateTime.Now.Year.ToString();
+        var ano = DateTime.Now.Year.ToString("D4");
         var numeroGerado = GerarNumero(mes, ano);
 
         var numeroVenda = new NumeroVenda

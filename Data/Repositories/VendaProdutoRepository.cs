@@ -5,6 +5,14 @@ namespace Data.Repositories;
 
 public class VendaProdutoRepository : BaseRepository<VendaProduto>, IVendaProdutoRepository
 {
+  private readonly IExternalDataContext<Produto> produtoExternalContext;
+
+  public VendaProdutoRepository(ILocalDataContext<VendaProduto> localDataContext, IExternalDataContext<Produto> produtoExternalContext)
+  : base(localDataContext)
+  {
+    this.produtoExternalContext = produtoExternalContext;
+  }
+
   public Task<IEnumerable<VendaProduto>> ObterPorIdVendaAsync(Guid idVenda)
   {
     var vendaProdutos = DadosParaTeste.Dados<VendaProduto>()
@@ -46,7 +54,7 @@ public class VendaProdutoRepository : BaseRepository<VendaProduto>, IVendaProdut
   {
     foreach (var vendaProdutoDto in venderProdutosDto.VenderProdutos)
     {
-      var produto = DadosParaTesteExternal.Dados<Produto>().Values
+      var produto = produtoExternalContext.Dados().Values
       .FirstOrDefault(produto => produto.Id == vendaProdutoDto.IdProduto);
 
       if (produto is null)
