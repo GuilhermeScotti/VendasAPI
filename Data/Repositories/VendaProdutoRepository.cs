@@ -15,7 +15,7 @@ public class VendaProdutoRepository : BaseRepository<VendaProduto>, IVendaProdut
 
   public Task<IEnumerable<VendaProduto>> ObterPorIdVendaAsync(Guid idVenda)
   {
-    var vendaProdutos = DadosParaTeste.Dados<VendaProduto>()
+    var vendaProdutos = localDataContext.Dados()
     .Values
     .Where(vendaProd => vendaProd.IdVenda == idVenda);
 
@@ -24,7 +24,7 @@ public class VendaProdutoRepository : BaseRepository<VendaProduto>, IVendaProdut
 
   public Task<IEnumerable<VendaProdutoDto>> ObterDtoPorIdVendaAsync(Guid idVenda)
   {
-    var vendaProdutos = DadosParaTeste.Dados<VendaProduto>()
+    var vendaProdutos = localDataContext.Dados()
     .Values
     .Where(vendaProd => vendaProd.IdVenda == idVenda);
 
@@ -35,7 +35,7 @@ public class VendaProdutoRepository : BaseRepository<VendaProduto>, IVendaProdut
 
   public async Task VenderProdutosAsync(Guid idVenda, VenderProdutosDto venderProdutosDto)
   {
-    using var transação = DadosParaTeste.IniciarTransação();
+    using var transação = localDataContext.IniciarTransação();
 
     try
     {

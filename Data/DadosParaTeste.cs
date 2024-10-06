@@ -4,31 +4,6 @@ using Domain.Entidades;
 
 namespace Data;
 
-public class LocalDataContext<TLocalEntity> : ILocalDataContext<TLocalEntity>
-  where TLocalEntity : ILocalEntity
-{
-  public IDictionary<Guid, TLocalEntity> Dados()
-  {
-    return DadosParaTeste.Dados<TLocalEntity>();
-  }
-
-  public ITransação IniciarTransação()
-  {
-    return DadosParaTeste.IniciarTransação();
-  }
-
-}
-
-
-public class ExternalDataContext<TExternalEntity> : IExternalDataContext<TExternalEntity>
-where TExternalEntity : IExternalEntity
-{
-  public IReadOnlyDictionary<Guid, TExternalEntity> Dados()
-  {
-    return DadosParaTeste.Dados<TExternalEntity>();
-  }
-}
-
 internal class DadosParaTeste
 {
   static DadosParaTeste()

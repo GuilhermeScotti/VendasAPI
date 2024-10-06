@@ -6,11 +6,10 @@ namespace Data.Repositories;
 public abstract class BaseRepository<TEntity> : BaseLocalReadOnlyRepository<TEntity>, IRepository<TEntity>
 where TEntity : ILocalEntity
 {
-  private readonly ILocalDataContext<TEntity> localDataContext;
 
   public BaseRepository(ILocalDataContext<TEntity> localDataContext)
+  : base(localDataContext)
   {
-    this.localDataContext = localDataContext;
   }
 
 
@@ -31,22 +30,30 @@ where TEntity : ILocalEntity
 
   public virtual Task<bool> DeletarAsync(Guid id)
   {
-    return Task.FromResult(DadosParaTeste.Dados<TEntity>().TryRemove(id, out _));
+    return Task.FromResult(localDataContext.Dados().Remove(id, out _));
   }
 }
 
 public abstract class BaseLocalReadOnlyRepository<TEntity> : IReadOnlyRepository<TEntity>
 where TEntity : ILocalEntity
 {
+  protected readonly ILocalDataContext<TEntity> localDataContext;
+
+  public BaseLocalReadOnlyRepository(ILocalDataContext<TEntity> localDataContext)
+  {
+    this.localDataContext = localDataContext;
+  }
+
+
   public virtual Task<TEntity?> ObterPorIdAsync(Guid id)
   {
-    DadosParaTeste.Dados<TEntity>().TryGetValue(id, out var cliente);
+    localDataContext.Dados().TryGetValue(id, out var cliente);
     return Task.FromResult(cliente);
   }
 
   public virtual Task<IEnumerable<TEntity>> ObterTodosAsync()
   {
-    return Task.FromResult(DadosParaTeste.Dados<TEntity>().Values.AsEnumerable());
+    return Task.FromResult(localDataContext.Dados().Values.AsEnumerable());
   }
 }
 
