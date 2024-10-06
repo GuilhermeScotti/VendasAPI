@@ -5,43 +5,43 @@ namespace Data.Repositories;
 
 public class VendaRepository : BaseRepository<Venda>, IVendaRepository
 {
-  private readonly IVendaProdutoRepository vendaProdutoRepository;
-  private readonly INumeroVendaRepository numeroVendaRepository;
-  private readonly ILocalDataContext<Venda> vendaContext;
-  private readonly IExternalDataContext<Filial> filialExternalContext;
-  private readonly IExternalDataContext<Cliente> clienteExternalContext;
-  private readonly ILocalDataContext<VendaProduto> vendaProdutoContext;
+  private readonly IVendaProdutoRepository _vendaProdutoRepository;
+  private readonly INumeroVendaRepository _numeroVendaRepository;
+  private readonly ILocalDataContext<Venda> _vendaContext;
+  private readonly IExternalDataContext<Filial> _filialExternalContext;
+  private readonly IExternalDataContext<Cliente> _clienteExternalContext;
+  private readonly ILocalDataContext<VendaProduto> _vendaProdutoContext;
 
   public VendaRepository(IVendaProdutoRepository vendaProdutoRepository,
   INumeroVendaRepository numeroVendaRepository, ILocalDataContext<Venda> vendaContext,
   IExternalDataContext<Filial> filialExternalContext, IExternalDataContext<Cliente> clienteExternalContext,
   ILocalDataContext<VendaProduto> vendaProdutoContext) : base(vendaContext)
   {
-    this.vendaProdutoRepository = vendaProdutoRepository;
-    this.numeroVendaRepository = numeroVendaRepository;
-    this.vendaContext = vendaContext;
-    this.filialExternalContext = filialExternalContext;
-    this.clienteExternalContext = clienteExternalContext;
-    this.vendaProdutoContext = vendaProdutoContext;
+    _vendaProdutoRepository = vendaProdutoRepository;
+    _numeroVendaRepository = numeroVendaRepository;
+    _vendaContext = vendaContext;
+    _filialExternalContext = filialExternalContext;
+    _clienteExternalContext = clienteExternalContext;
+    _vendaProdutoContext = vendaProdutoContext;
   }
 
   public async Task<Venda> AdicionarDeDtoAsync(CriarVendaDto criarVendaDto)
   {
-    using var transação = vendaContext.IniciarTransação();
+    using var transação = _vendaContext.IniciarTransação();
 
     try
     {
-      var cliente = clienteExternalContext.Dados()
+      var cliente = _clienteExternalContext.Dados()
       .Values
       .FirstOrDefault(cliente => cliente.Id == criarVendaDto.IdCliente)
       ?? throw new Exception("Cliente inexistente.");
 
-      var filial = filialExternalContext.Dados()
+      var filial = _filialExternalContext.Dados()
       .Values
       .FirstOrDefault(filial => filial.Id == criarVendaDto.IdFilial)
       ?? throw new Exception("Filial inexistente."); ;
 
-      var numeroVenda = await numeroVendaRepository.GerarNumeroVendaAsync();
+      var numeroVenda = await _numeroVendaRepository.GerarNumeroVendaAsync();
 
       if (numeroVenda is null)
         throw new Exception("Não foi possívle criar numero de venda.");
@@ -58,7 +58,7 @@ public class VendaRepository : BaseRepository<Venda>, IVendaRepository
         Numero = $"{numeroVenda.Mes}-{numeroVenda.Ano}-{numeroVenda.Numero}"
       };
 
-      vendaContext.Dados()[venda.Id] = venda;
+      _vendaContext.Dados()[venda.Id] = venda;
       transação.Completar();
 
       return venda;
@@ -72,9 +72,9 @@ public class VendaRepository : BaseRepository<Venda>, IVendaRepository
 
   public override async Task<bool> DeletarAsync(Guid id)
   {
-    var vendaProdutos = await vendaProdutoRepository.ObterPorIdVendaAsync(id);
+    var vendaProdutos = await _vendaProdutoRepository.ObterPorIdVendaAsync(id);
 
-    using var transação = vendaContext.IniciarTransação();
+    using var transação = _vendaContext.IniciarTransação();
 
     try
     {
@@ -96,21 +96,21 @@ public class VendaRepository : BaseRepository<Venda>, IVendaRepository
 
     if (venda is null) return null;
 
-    var vendaProdutoDtos = await vendaProdutoRepository.ObterDtoPorIdVendaAsync(id);
+    var vendaProdutoDtos = await _vendaProdutoRepository.ObterDtoPorIdVendaAsync(id);
 
     return VendaCompletaDto.ObterDeVenda(venda, vendaProdutoDtos.ToList());
   }
 
   private Task DeletarVenda(Guid idVenda, IEnumerable<VendaProduto> vendaProdutos)
   {
-    if (!vendaContext.Dados().Remove(idVenda, out _))
+    if (!_vendaContext.Dados().Remove(idVenda, out _))
     {
       throw new Exception("Falha ao deletar venda");
     }
 
     foreach (var vendaProduto in vendaProdutos)
     {
-      if (!vendaProdutoContext.Dados().Remove(vendaProduto.Id, out _))
+      if (!_vendaProdutoContext.Dados().Remove(vendaProduto.Id, out _))
       {
         throw new Exception("Falha ao deletar venda produto");
       }

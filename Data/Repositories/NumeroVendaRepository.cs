@@ -19,7 +19,7 @@ public class NumeroVendaRepository : BaseRepository<NumeroVenda>, INumeroVendaRe
 
     do
     {
-      using var transação = localDataContext.IniciarTransação();
+      using var transação = _localDataContext.IniciarTransação();
 
       try
       {
@@ -35,7 +35,7 @@ public class NumeroVendaRepository : BaseRepository<NumeroVenda>, INumeroVendaRe
           Numero = numeroGerado
         };
 
-        localDataContext.Dados()[numeroVenda.Id] = numeroVenda;
+        _localDataContext.Dados()[numeroVenda.Id] = numeroVenda;
 
         transação.Completar();
         return Task.FromResult<NumeroVenda?>(numeroVenda);
@@ -53,7 +53,7 @@ public class NumeroVendaRepository : BaseRepository<NumeroVenda>, INumeroVendaRe
 
   private int GerarNumero(string mes, string ano)
   {
-    var ultimoNumeroVenda = localDataContext.Dados().Values
+    var ultimoNumeroVenda = _localDataContext.Dados().Values
     .Where(numero => numero.Mes == mes && numero.Ano == ano)
     .OrderByDescending(venda => venda.Numero)
     .Select(venda => venda.Numero)

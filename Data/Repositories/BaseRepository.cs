@@ -15,68 +15,68 @@ where TEntity : ILocalEntity
 
   public virtual Task AdicionarAsync(TEntity entidade)
   {
-    localDataContext.Dados()[entidade.Id] = entidade;
+    _localDataContext.Dados()[entidade.Id] = entidade;
     return Task.CompletedTask;
   }
 
   public virtual Task AtualizarAsync(TEntity entidade)
   {
-    if (localDataContext.Dados().ContainsKey(entidade.Id))
+    if (_localDataContext.Dados().ContainsKey(entidade.Id))
     {
-      localDataContext.Dados()[entidade.Id] = entidade;
+      _localDataContext.Dados()[entidade.Id] = entidade;
     }
     return Task.CompletedTask;
   }
 
   public virtual Task<bool> DeletarAsync(Guid id)
   {
-    return Task.FromResult(localDataContext.Dados().Remove(id, out _));
+    return Task.FromResult(_localDataContext.Dados().Remove(id, out _));
   }
 }
 
 public abstract class BaseLocalReadOnlyRepository<TEntity> : IReadOnlyRepository<TEntity>
 where TEntity : ILocalEntity
 {
-  protected readonly ILocalDataContext<TEntity> localDataContext;
+  protected readonly ILocalDataContext<TEntity> _localDataContext;
 
   public BaseLocalReadOnlyRepository(ILocalDataContext<TEntity> localDataContext)
   {
-    this.localDataContext = localDataContext;
+    _localDataContext = localDataContext;
   }
 
 
   public virtual Task<TEntity?> ObterPorIdAsync(Guid id)
   {
-    localDataContext.Dados().TryGetValue(id, out var cliente);
+    _localDataContext.Dados().TryGetValue(id, out var cliente);
     return Task.FromResult(cliente);
   }
 
   public virtual Task<IEnumerable<TEntity>> ObterTodosAsync()
   {
-    return Task.FromResult(localDataContext.Dados().Values.AsEnumerable());
+    return Task.FromResult(_localDataContext.Dados().Values.AsEnumerable());
   }
 }
 
 public abstract class BaseExternalReadOnlyRepository<TEntity> : IReadOnlyRepository<TEntity>
 where TEntity : IExternalEntity
 {
-  private readonly IExternalDataContext<TEntity> externalDataContext;
+  private readonly IExternalDataContext<TEntity> _externalDataContext;
 
   public BaseExternalReadOnlyRepository(IExternalDataContext<TEntity> externalDataContext)
   {
-    this.externalDataContext = externalDataContext;
+    _externalDataContext = externalDataContext;
   }
 
 
   public virtual Task<TEntity?> ObterPorIdAsync(Guid id)
   {
-    externalDataContext.Dados().TryGetValue(id, out var cliente);
+    _externalDataContext.Dados().TryGetValue(id, out var cliente);
     return Task.FromResult(cliente);
   }
 
   public virtual Task<IEnumerable<TEntity>> ObterTodosAsync()
   {
-    return Task.FromResult(externalDataContext.Dados().Values.AsEnumerable());
+    return Task.FromResult(_externalDataContext.Dados().Values.AsEnumerable());
   }
 }
 
