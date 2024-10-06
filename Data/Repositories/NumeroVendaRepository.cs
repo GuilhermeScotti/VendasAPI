@@ -5,6 +5,12 @@ namespace Data.Repositories;
 
 public class NumeroVendaRepository : BaseRepository<NumeroVenda>, INumeroVendaRepository
 {
+
+  public NumeroVendaRepository(ILocalDataContext<NumeroVenda> localDataContext)
+  : base(localDataContext)
+  {
+  }
+
   private const int MAX_TENTATIVAS = 5;
 
   public Task<NumeroVenda?> GerarNumeroVendaAsync()
@@ -13,12 +19,12 @@ public class NumeroVendaRepository : BaseRepository<NumeroVenda>, INumeroVendaRe
 
     do
     {
-      using var transação = DadosParaTeste.IniciarTransação();
+      using var transação = _localDataContext.IniciarTransação();
 
       try
       {
         var mes = DateTime.Now.Month.ToString("D2");
-        var ano = DateTime.Now.Year.ToString();
+        var ano = DateTime.Now.Year.ToString("D4");
         var numeroGerado = GerarNumero(mes, ano);
 
         var numeroVenda = new NumeroVenda
@@ -29,7 +35,7 @@ public class NumeroVendaRepository : BaseRepository<NumeroVenda>, INumeroVendaRe
           Numero = numeroGerado
         };
 
-        DadosParaTeste.Dados<NumeroVenda>()[numeroVenda.Id] = numeroVenda;
+        _localDataContext.Dados()[numeroVenda.Id] = numeroVenda;
 
         transação.Completar();
         return Task.FromResult<NumeroVenda?>(numeroVenda);
@@ -47,7 +53,7 @@ public class NumeroVendaRepository : BaseRepository<NumeroVenda>, INumeroVendaRe
 
   private int GerarNumero(string mes, string ano)
   {
-    var ultimoNumeroVenda = DadosParaTeste.Dados<NumeroVenda>().Values
+    var ultimoNumeroVenda = _localDataContext.Dados().Values
     .Where(numero => numero.Mes == mes && numero.Ano == ano)
     .OrderByDescending(venda => venda.Numero)
     .Select(venda => venda.Numero)

@@ -1,3 +1,4 @@
+using Data;
 using Data.Repositories;
 using DataAbstraction.Repositories;
 using Domain.Entidades;
@@ -21,6 +22,8 @@ builder.Services.AddScoped<IVendaProdutoRepository, VendaProdutoRepository>();
 builder.Services.AddScoped<IRepository<VendaProduto>, VendaProdutoRepository>();
 builder.Services.AddScoped<IReadOnlyRepository<Produto>, ProdutoRepository>();
 builder.Services.AddScoped<INumeroVendaRepository, NumeroVendaRepository>();
+builder.Services.AddScoped(typeof(ILocalDataContext<>), typeof(LocalDataContext<>));
+builder.Services.AddScoped(typeof(IExternalDataContext<>), typeof(ExternalDataContext<>));
 
 builder.Services.AddSingleton<IServiçoDeMensageria, ServiçoDeMensageria>();
 

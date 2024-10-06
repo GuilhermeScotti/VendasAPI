@@ -5,9 +5,17 @@ namespace Data.Repositories;
 
 public class VendaProdutoRepository : BaseRepository<VendaProduto>, IVendaProdutoRepository
 {
+  private readonly IExternalDataContext<Produto> _produtoExternalContext;
+
+  public VendaProdutoRepository(ILocalDataContext<VendaProduto> localDataContext, IExternalDataContext<Produto> produtoExternalContext)
+  : base(localDataContext)
+  {
+    _produtoExternalContext = produtoExternalContext;
+  }
+
   public Task<IEnumerable<VendaProduto>> ObterPorIdVendaAsync(Guid idVenda)
   {
-    var vendaProdutos = DadosParaTeste.Dados<VendaProduto>()
+    var vendaProdutos = _localDataContext.Dados()
     .Values
     .Where(vendaProd => vendaProd.IdVenda == idVenda);
 
@@ -16,7 +24,7 @@ public class VendaProdutoRepository : BaseRepository<VendaProduto>, IVendaProdut
 
   public Task<IEnumerable<VendaProdutoDto>> ObterDtoPorIdVendaAsync(Guid idVenda)
   {
-    var vendaProdutos = DadosParaTeste.Dados<VendaProduto>()
+    var vendaProdutos = _localDataContext.Dados()
     .Values
     .Where(vendaProd => vendaProd.IdVenda == idVenda);
 
@@ -27,7 +35,7 @@ public class VendaProdutoRepository : BaseRepository<VendaProduto>, IVendaProdut
 
   public async Task VenderProdutosAsync(Guid idVenda, VenderProdutosDto venderProdutosDto)
   {
-    using var transação = DadosParaTeste.IniciarTransação();
+    using var transação = _localDataContext.IniciarTransação();
 
     try
     {
@@ -46,7 +54,7 @@ public class VendaProdutoRepository : BaseRepository<VendaProduto>, IVendaProdut
   {
     foreach (var vendaProdutoDto in venderProdutosDto.VenderProdutos)
     {
-      var produto = DadosParaTesteExternal.Dados<Produto>().Values
+      var produto = _produtoExternalContext.Dados().Values
       .FirstOrDefault(produto => produto.Id == vendaProdutoDto.IdProduto);
 
       if (produto is null)
