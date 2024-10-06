@@ -73,7 +73,7 @@ app.MapPost("/vendas", async (CriarVendaDto novaVenda, IVendaRepository repo, IS
 {
   var vendaCriada = await repo.AdicionarDeDtoAsync(novaVenda);
 
-  await mensageria.CompraCriada();
+  await mensageria.VendaCriada(vendaCriada.Id);
   Log.Information("Venda criada com sucesso: {VendaId}", vendaCriada.Id);
   return Results.Created($"/vendas/{vendaCriada.Id}", vendaCriada);
 })
@@ -101,13 +101,48 @@ app.MapPatch("/vendas/{id}/cancelar", async (Guid id, CancelarVendaDto atualizar
     MotivoCancelamento = atualizarVendaDto.MotivoCancelamento
   });
 
-  await mensageria.CompraCancelada();
+  await mensageria.VendaCancelada(venda.Id);
 
   Log.Information("Venda com ID {VendaId} cancelada com sucesso.", id);
 
   return Results.NoContent();
 })
 .WithName("CancelarVenda");
+
+app.MapPatch("/vendas/{id}/fechar", async (Guid id, CancelarVendaDto atualizarVendaDto, IRepository<Venda> repo, IServiçoDeMensageria mensageria) =>
+{
+  var venda = await repo.ObterPorIdAsync(id);
+
+  if (venda is null)
+  {
+    Log.Warning("Cancelando Venda com ID {VendaId} não encontrada.", id);
+    return Results.NotFound();
+  }
+
+  if (venda.Cancelado)
+  {
+    Log.Warning("Tentativa de cancelar a venda com ID {VendaId} que já está cancelada.", id);
+    return Results.Problem("Venda já cancelada.");
+  }
+
+  if (venda.Fechada)
+  {
+    Log.Warning("Tentativa de fechar a venda com ID {VendaId} que já está fechada.", id);
+    return Results.Problem("Venda já fechada.");
+  }
+
+  await repo.AtualizarAsync(venda with
+  {
+    Fechada = true
+  });
+
+  await mensageria.VendaCancelada(venda.Id);
+
+  Log.Information("Venda com ID {VendaId} cancelada com sucesso.", id);
+
+  return Results.NoContent();
+})
+.WithName("FecharVenda");
 
 app.MapPost("/vendas/{id}/produtos", async (Guid id, VenderProdutosDto venderProdutosDto,
   IVendaProdutoRepository repo,
@@ -130,7 +165,7 @@ app.MapPost("/vendas/{id}/produtos", async (Guid id, VenderProdutosDto venderPro
 
   await repo.VenderProdutosAsync(id, venderProdutosDto);
 
-  await mensageria.CompraAlterada();
+  await mensageria.VendaAlterada(venda.Id);
   Log.Information("Adicionando produtos à venda com ID {VendaId}", id);
   return Results.NoContent();
 })
@@ -163,7 +198,7 @@ app.MapPatch("/vendas/cancelarVendaProduto/{id}", async (
     Cancelado = true,
   });
 
-  await mensageria.ItemCancelado();
+  await mensageria.ItemCancelado(vendaProduto.Id);
   Log.Information("Produto com ID {ProdutoId} cancelado com sucesso.", id);
   return Results.NoContent();
 })
@@ -175,7 +210,7 @@ app.MapDelete("/vendas/{id}", async (Guid id, IRepository<Venda> repo, IServiço
 
   if (deleted)
   {
-    await mensageria.CompraExcluida();
+    await mensageria.VendaExcluida(id);
     Log.Information("Venda com ID {VendaId} excluída com sucesso.", id);
     return Results.NoContent();
   }
