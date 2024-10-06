@@ -223,4 +223,5 @@ app.MapDelete("/vendas/{id}", async (Guid id, IRepository<Venda> repo, IServiço
 })
 .WithName("DeletarVenda");
 
-app.Run();
+//Para teste "http://0.0.0.0:5063"
+app.Run("http://0.0.0.0:5063");
