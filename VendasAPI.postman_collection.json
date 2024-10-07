@@ -1,0 +1,229 @@
+{
+	"info": {
+		"_postman_id": "fc6f2a7d-6d2f-4c37-b3b8-a3ae7f63fa05",
+		"name": "VendasAPI",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "38200944"
+	},
+	"item": [
+		{
+			"name": "Obter Vendas",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5063/vendas",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5063",
+					"path": [
+						"vendas"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Obter Detalhes da Venda Por Id",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5063/vendas/5b165226-bf9a-4960-8a88-a99f9fe16f5a/detalhes",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5063",
+					"path": [
+						"vendas",
+						"5b165226-bf9a-4960-8a88-a99f9fe16f5a",
+						"detalhes"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Obter Venda Por Id",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5063/vendas/5b165226-bf9a-4960-8a88-a99f9fe16f5a",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5063",
+					"path": [
+						"vendas",
+						"5b165226-bf9a-4960-8a88-a99f9fe16f5a"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Criar Venda",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"idCliente\": \"9eb0bd40-0169-4096-8fd5-95e6dadf6a94\",\n    \"idFilial\": \"49bc7d4f-630f-4532-97c7-67543addf605\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5063/vendas",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5063",
+					"path": [
+						"vendas"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Cancelar Venda",
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n        \"motivoCancelamento\": \"Cliente desistiu\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5063/vendas/e9ec29f8-d539-4c9f-9c0b-5a7d585860dc/cancelar",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5063",
+					"path": [
+						"vendas",
+						"e9ec29f8-d539-4c9f-9c0b-5a7d585860dc",
+						"cancelar"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Cancelar Venda de Produto",
+			"request": {
+				"method": "PATCH",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n        \"motivoCancelamento\": \"Cliente desistiu\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5063/vendas/cancelarVendaProduto/6dbb267a-5cee-4ba8-bbf3-f165660141c5",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5063",
+					"path": [
+						"vendas",
+						"cancelarVendaProduto",
+						"6dbb267a-5cee-4ba8-bbf3-f165660141c5"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Vender Produtos na Venda",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"VenderProdutos\": [\n    {\n      \"IdProduto\": \"a78a4f84-29f3-48f7-9c63-8124a43f578e\",\n      \"Quantidade\": 2,\n      \"PorcentagemDesconto\": 0\n    },\n    {\n      \"IdProduto\": \"c4e1e43e-b798-4c7a-b204-5b0d6e0d6a9d\",\n      \"Quantidade\": 5,\n      \"PorcentagemDesconto\": 15.5\n    }\n  ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:5063/vendas/5b165226-bf9a-4960-8a88-a99f9fe16f5a/produtos",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5063",
+					"path": [
+						"vendas",
+						"5b165226-bf9a-4960-8a88-a99f9fe16f5a",
+						"produtos"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Obter Detalhes da Venda (com produtos adicionados acima)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5063/vendas/5b165226-bf9a-4960-8a88-a99f9fe16f5a/detalhes",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5063",
+					"path": [
+						"vendas",
+						"5b165226-bf9a-4960-8a88-a99f9fe16f5a",
+						"detalhes"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Deletar Venda",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:5063/vendas/e9ec29f8-d539-4c9f-9c0b-5a7d585860dc",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "5063",
+					"path": [
+						"vendas",
+						"e9ec29f8-d539-4c9f-9c0b-5a7d585860dc"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
