@@ -20,12 +20,6 @@ public class VendaProdutoRepositoryTests
     _localDataContext = Substitute.For<ILocalDataContext<VendaProduto>>();
     _produtoExternalContext = Substitute.For<IExternalDataContext<Produto>>();
     _vendaProdutoRepository = new VendaProdutoRepository(_localDataContext, _produtoExternalContext);
-
-    _apiContainer = new ContainerBuilder()
-      .WithImage("api-de-vendas")
-      .WithPortBinding(5063, false)
-      .WithWaitStrategy(Wait.ForUnixContainer().UntilHttpRequestIsSucceeded(r => r.ForPort(5063)))
-      .Build();
   }
 
   [Fact]
